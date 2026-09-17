@@ -1,9 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, ShoppingBag, ShoppingCart, X } from "lucide-react";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => Boolean(localStorage.getItem("authToken")));
+
+  useEffect(() => {
+    function updateAuthState() {
+      setIsAuthenticated(Boolean(localStorage.getItem("authToken")));
+    }
+
+    window.addEventListener("auth-state-change", updateAuthState);
+    return () => window.removeEventListener("auth-state-change", updateAuthState);
+  }, []);
 
   const closeMenu = () => setMenuOpen(false);
 
@@ -23,7 +33,7 @@ function Navbar() {
           <Link to="/" className="hover:text-gray-500">Home</Link>
           <Link to="/products" className="hover:text-gray-500">Products</Link>
           <Link to="/wishlist" className="hover:text-gray-500">Wishlist</Link>
-          <Link to="/account" className="hover:text-gray-500">Account</Link>
+          {!isAuthenticated && <Link to="/account" className="hover:text-gray-500">Account</Link>}
           <Link to="/cart" className="flex items-center gap-1 hover:text-gray-500">
             <ShoppingCart size={18} /> Cart
           </Link>
@@ -66,7 +76,7 @@ function Navbar() {
               <Link to="/" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-[#f5f6fa]">Home</Link>
               <Link to="/products" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-[#f5f6fa]">Products</Link>
               <Link to="/wishlist" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-[#f5f6fa]">Wishlist</Link>
-              <Link to="/account" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-[#f5f6fa]">Account</Link>
+              {!isAuthenticated && <Link to="/account" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-[#f5f6fa]">Account</Link>}
               <Link to="/cart" onClick={closeMenu} className="rounded-xl px-4 py-3 hover:bg-[#f5f6fa]">Cart</Link>
             </div>
           </div>

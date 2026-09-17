@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/cartcontent";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 function Checkout() {
   const { cartItems, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
@@ -14,23 +16,52 @@ function Checkout() {
     zip: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // No real payment yet — just simulate a successful order
-    setSubmitted(true);
-    clearCart();
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, items: cartItems, total: cartTotal }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to place order");
+      }
+
+      setEmailSent(data.emailSent);
+      setSubmitted(true);
+      clearCart();
+    } catch (submitError) {
+      setError(submitError instanceof TypeError
+        ? "The order service is unavailable. Start the backend and try again."
+        : (submitError.message || "Unable to place order. Please try again."));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (submitted) {
     return (
       <div className="p-6 max-w-xl mx-auto text-center">
         <h1 className="text-2xl font-bold mb-2">Order placed! 🎉</h1>
-        <p className="text-gray-600">Thanks, {form.name} — a confirmation would normally be emailed to {form.email}.</p>
+        <p className="text-gray-600">
+          Thanks, {form.name} — your order is approved. {emailSent
+            ? `Your receipt has been emailed to ${form.email}.`
+            : "Your receipt email is pending. Please check your email shortly."}
+        </p>
         <button
           onClick={() => navigate("/")}
           className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
@@ -62,9 +93,11 @@ function Checkout() {
             placeholder="ZIP code" className="border rounded-md px-3 py-2 w-28" />
         </div>
         <button type="submit"
+          disabled={isSubmitting}
           className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-          Place Order
+          {isSubmitting ? "Sending confirmation..." : "Place Order"}
         </button>
+        {error && <p className="text-red-600" role="alert">{error}</p>}
       </form>
 
       <div>

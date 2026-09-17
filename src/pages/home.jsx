@@ -38,6 +38,13 @@ const categories = [
 ];
 
 function Home() {
+  const [user] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("authUser")) || null;
+    } catch {
+      return null;
+    }
+  });
   const [activeCategory, setActiveCategory] = useState(0);
   const [pointer, setPointer] = useState({ x: -200, y: -200 });
   const sectionRefs = useRef([]);
@@ -70,6 +77,9 @@ function Home() {
       <div className="cursor-glow" style={{ left: pointer.x, top: pointer.y }} aria-hidden="true" />
       <section className="mx-auto grid w-full max-w-7xl items-end gap-10 px-4 pb-20 pt-12 sm:px-6 sm:pb-28 sm:pt-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20 lg:px-8 lg:pt-24">
         <div className="category-reveal max-w-xl">
+          {user?.name && (
+            <p className="welcome-message">Welcome, {user.name.trim().split(/\s+/)[0]}!</p>
+          )}
           <div className="mb-5 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#f05d5e]">
             <Sparkles size={17} /> Curated for your everyday
           </div>
@@ -90,9 +100,9 @@ function Home() {
           </button>
         </div>
 
-        <div className="hero-collage relative min-h-[25rem] sm:min-h-[34rem]">
+        <div className="hero-collage relative min-h-100 sm:min-h-136">
           <div className="hero-collage-card hero-collage-card-back" />
-          <div className="hero-collage-card hero-collage-card-front overflow-hidden rounded-[2rem]">
+          <div className="hero-collage-card hero-collage-card-front overflow-hidden rounded-4xl">
             <img src={categories[activeCategory].image} alt="A Davis_Gee collection" className="h-full w-full object-cover transition duration-700 hover:scale-105" />
           </div>
           <div className="hero-sticker">Davis_Gee<br /><span>for every direction</span></div>
@@ -118,9 +128,9 @@ function Home() {
         </div>
         <div className="space-y-8 sm:space-y-12">
           {categories.map((item, index) => (
-            <article key={item.slug} ref={(element) => { sectionRefs.current[index] = element; }} data-index={index} className="category-story grid min-h-[34rem] overflow-hidden rounded-[2rem] bg-white shadow-sm lg:grid-cols-2" style={{ "--story-accent": item.accent }}>
+            <article key={item.slug} ref={(element) => { sectionRefs.current[index] = element; }} data-index={index} className="category-story grid min-h-136 overflow-hidden rounded-4xl bg-white shadow-sm lg:grid-cols-2" style={{ "--story-accent": item.accent }}>
               <div className={`category-story-image ${index % 2 === 1 ? "lg:order-2" : ""}`}>
-                <img src={item.image} alt={item.name} className="h-full min-h-[20rem] w-full object-cover" />
+                <img src={item.image} alt={item.name} className="h-full min-h-80 w-full object-cover" />
               </div>
               <div className={`flex flex-col justify-center p-7 sm:p-12 lg:p-16 ${index % 2 === 1 ? "lg:order-1" : ""}`}>
                 <p className="mb-5 text-sm font-semibold uppercase tracking-[0.2em] text-[#f05d5e]">{item.kicker}</p>

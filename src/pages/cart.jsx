@@ -18,6 +18,7 @@ function Cart() {
             <div>
               <p className="font-semibold">{item.name}</p>
               <p className="text-gray-500 text-sm">${item.price.toFixed(2)}</p>
+              <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -35,16 +36,15 @@ function Cart() {
               Remove
             </button>
           </div>
-          <div className="text-right mt-6">
-             <div className="text-xl font-bold mb-3">Total: ${cartTotal.toFixed(2)}</div>
-             <Link to="/checkout" className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 inline-block">
-                 Checkout
-             </Link>
-</div>
         </div>
       ))}
-      <div className="text-right mt-6 text-xl font-bold">
-        Total: ${cartTotal.toFixed(2)}
+      <div className="mt-6 flex flex-col items-end gap-3">
+        <div className="text-xl font-bold">
+          Total: ${cartTotal.toFixed(2)}
+        </div>
+        <Link to="/checkout" className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 inline-block">
+          Checkout
+        </Link>
       </div>
     </div>
   );

@@ -56,7 +56,6 @@ function ProductDetail() {
   function handleAddToCart() {
     addToCart(product);
     setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
   }
 
   return (
@@ -70,8 +69,13 @@ function ProductDetail() {
         onClick={handleAddToCart}
         className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
       >
-        {added ? "Added ✓" : "Add to Cart"}
+        {added ? "Added to Cart" : "Add to Cart"}
       </button>
+      {added && (
+        <Link to="/cart" className="ml-4 text-blue-600 hover:underline">
+          View cart
+        </Link>
+      )}
     </div>
   );
 }
